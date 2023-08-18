@@ -1,23 +1,20 @@
-# RIVA-System
+# Terminal System: A Comprehensive Cross-Platform Solution
+The Terminal System presents an integrated backend and frontend solution designed to operate seamlessly across multiple platforms. The application component is developed using the Flutter framework, while the web aspect is powered by the Blazor framework and the .NET framework. To facilitate data management, a dedicated domain is utilized to store user information, product details, locations, and more.
 
-A complete backend and frontend cross platform application and system. The application side of this system was made with Flutter framework and the web side of it was made with using Blazor and dot-net framework. The system also requires a seperate domain to store user, product, location etc... data. 
+## Introduction:
+The successful execution of this project demands proficiency in a diverse range of domains. These domains predominantly encompass languages such as Dart, C#, PHP, HTML, and CSS. The frameworks employed encompass Laravel, Blazor, and Flutter. By project completion, participants will have acquired the skills to craft a comprehensive cross-platform application via Flutter's Dart, execute GET, POST, and PUT requests to extract data from a web database, utilize Laravel's My Admin for efficient data storage and administration, develop and deploy web applications using the Blazor framework.
 
-## Preface:
-This project requires a lot of knowledge in different kind of areas. These areas mostly include Dart, C#, PHP, HTML, CSS languages. The frameworks used in this project are Laravel, Blazor and Flutter. By the end of this project, you will be able to write a complete cross platform application with flutter using Dart, do POST, GET, PUT requests to collect data from a database on Web. Store and manage data with using laravel my admin, make web applications and publish them using blazor framework.
+## Prerequisites:
+Visual Studio
+Blazor and .NET frameworks
+Personal domain with hosting service
+Flutter 3.0
 
-## Requirements:
-- Visual Studio
-- Blazor and dot-net frameworks
-- Personal domain with hosting service
-- Flutter 3.0
+## Utilized Languages
+Dart
+C#
+HTML
+CSS
+PHP
 
-## Languages Used:
-- Dart
-- C#
-- HTML
-- CSS
-- PHP
 
-**NOTE: Each of the items listed above has their own requirements.**
-
-<img align="left" width=200px height=400px src="https://user-images.githubusercontent.com/111835151/188008252-c1cf0d69-73e1-424c-9403-cbc15ba41776.gif"/>
