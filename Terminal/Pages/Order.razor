@@ -1,0 +1,199 @@
+﻿@page "/orders"
+@using Models
+@using Helpers
+@using System.Timers
+
+<div class="top-row ps-3 navbar navbar-dark" style="margin-top:20px">
+    <div class="container-fluid">
+        <a class="navbar-brand" style="color:#6E0AEE" href="">RIVA Terminal&emsp;-&emsp;<strong>Online Orders</strong></a>
+        <button title="Navigation menu" class="navbar-toggler" style="background-color:#6E0AEE" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-row">
+        <table>
+            <th class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
+            </th>
+            <th class="nav-item px-3">
+                <NavLink class="nav-link" href="locations">
+                    <span class="oi oi-basket" aria-hidden="true"></span> Locations
+                </NavLink>
+            </th>
+            <th class="nav-item px-3">
+                <NavLink class="nav-link" href="setorder">
+                    <span class="oi oi-basket" aria-hidden="true"></span> Set Order
+                </NavLink>
+            </th>
+        </table>
+    </nav>
+</div>
+
+@if (orderRoot == null)
+{
+    <div class="background-image"></div>
+    @*<p><em>Loading...</em></p>*@
+}
+else
+{
+    <table>
+            <tr style="background-color:#6E0AEE; font-weight:bold">
+                @*<th>Select</th>*@
+                <td></td>
+                <td>ID</td>
+                <td>User ID</td>
+                <td>Order Description</td>
+                <td>Total Price</td>
+                <td>Table Number</td>
+                <td>Order Status</td>
+                <td>Payment Method</td>
+                <td>Payment Status</td>
+                <td>Restaurant ID</td>
+                <td>Created At</td>
+                <td>Updated At</td>
+                <td></td>
+            </tr>
+        <tbody>
+            @foreach (var data in orderRoot.orders)
+            {
+                <tr style="color:white; box-shadow:30px 5px 10px 0px rgba(0, 0, 0, 0.5); border-radius:10px">
+                    <input type="checkbox" checked="@isChecked" style="margin-top:38px" @oninput="e => CheckboxChanged(e, data)">
+                    <td style="border-top-left-radius:10px; border-bottom-left-radius:10px">@data.id</td>   
+                    <td>@data.user_id</td>
+                    <td>@data.order_description</td>
+                    <td>$@data.total_price</td>
+                    <td>@data.table_number</td>
+                    @if(data.order_status == "Pending")
+                    {
+                        <td><span style="color:black; background-color:yellow">@data.order_status</span></td>
+                    }
+                    @if(data.order_status == "Confirmed")
+                    {
+                        <td><span style="color:black; background-color:lawngreen">@data.order_status</span></td>
+                    }
+                    @if(data.order_status == "Canceled")
+                    {
+                        <td><span style="color:black; background-color:red">@data.order_status</span></td>
+                    }
+                    <td>@data.payment_method</td>
+                    @if(data.payment_status == "pending")
+                    {
+                        <td><span style="color:black; background-color:yellow">@data.payment_status</span></td>
+                    }
+                    @if(data.payment_status == "Confirmed")
+                    {
+                        <td><span style="color:black; background-color:lawngreen">@data.payment_status</span></td>
+                    }
+                    @if(data.payment_status == "Canceled")
+                    {
+                        <td><span style="color:black; background-color:red">@data.payment_status</span></td>
+                    }
+                    <td>@data.restaurant_id</td>
+                    <td>@data.created_at</td>
+                    <td>@data.updated_at</td>
+                    <td><button class="btn btn-primary oi oi-pencil" style="margin-bottom:4px">Edit</button><button class="btn btn-danger">Cancel</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<style>
+    body{
+        background-color:#181818;
+    }
+
+    table { 
+    border-collapse: separate; 
+    border-spacing: 0 20px; 
+}
+td {
+    border: solid 3px #6E0AEE;
+    border-style: solid none;
+    padding: 10px;
+}
+td:first-child {
+    border-left-style: solid;
+    border-top-left-radius: 10px; 
+    border-bottom-left-radius: 10px;
+}
+td:last-child {
+    border-right-style: solid;
+    border-bottom-right-radius: 10px; 
+    border-top-right-radius: 10px; 
+}
+</style>
+
+@code{
+
+    [Inject]
+    private HttpClient Http { get; set; }
+    private OrderRoot? orderRoot;
+    private OrderModel orderModel = new OrderModel();
+    private bool isChecked = false;
+    private Timer time;
+    bool showModal = false;
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task CheckboxChanged(ChangeEventArgs e, OrderModel orderModel)
+    {
+        orderModel.order_status = "Confirmed";
+        e.Value = true;
+        await updateOrderData(orderModel);
+    }
+
+    private void setShowModalTrue() => showModal = true;
+    private void setShowModalFalse() => showModal = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await getOrderData();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            time = new Timer();
+            time.Interval = 3000;
+            time.Elapsed += OnTimerInterval;
+            time.AutoReset = true;
+            time.Enabled = true;
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+    private async void OnTimerInterval(Object sender, ElapsedEventArgs e)
+    {
+        await getOrderData();
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public async Task getOrderData()
+    {
+        orderRoot = await Http.GetFromJsonAsync<OrderRoot>("http://db.zenexserver.com/api/v1/orders");
+    }
+
+    public async Task updateOrderData(OrderModel updatedOrderModel)
+    {
+        var response = await Http.PutAsJsonAsync<OrderModel>("http://db.zenexserver.com/api/v1/orders", updatedOrderModel);
+        await getOrderData();
+    }
+
+    public void Dispose()
+    {
+        time?.Dispose();
+    }
+}
